@@ -7,125 +7,80 @@ import os
 engine = pyttsx3.init()
 
 def speak(text):
-
     print(text)
-
     engine.say(text)
-
     engine.runAndWait()
 
 def listen():
-
     recognizer = sr.Recognizer()
 
     with sr.Microphone() as source:
-
-        print("Say Command...")
-
+        print("Listening...")
         recognizer.adjust_for_ambient_noise(source)
 
-        audio = recognizer.listen(source)
+        try:
+            audio = recognizer.listen(source, timeout=5)
+            command = recognizer.recognize_google(audio)
 
-    try:
+            command = command.lower()
 
-        command = recognizer.recognize_google(audio)
+            print("You said:", command)
 
-        command = command.lower()
+            return command
 
-        print("You Said:", command)
-
-        return command
-
-    except:
-
-        return ""
+        except Exception as e:
+            print("Voice Error:", e)
+            return ""
 
 def execute_voice_command(command):
 
     # OPEN GOOGLE
     if "open google" in command:
-
         speak("Opening Google")
-
         webbrowser.open("https://www.google.com")
 
     # OPEN YOUTUBE
     elif "open youtube" in command:
-
         speak("Opening YouTube")
-
         webbrowser.open("https://www.youtube.com")
 
     # OPEN CHATGPT
     elif "open chatgpt" in command:
-
         speak("Opening ChatGPT")
-
         webbrowser.open("https://chat.openai.com")
-
-    # OPEN CHROME
-    elif "open chrome" in command:
-
-        speak("Opening Chrome")
-
-        os.system("start chrome")
 
     # OPEN SETTINGS
     elif "open settings" in command:
-
         speak("Opening Settings")
-
         os.system("start ms-settings:")
 
-    # OPEN PERFORMANCE / TASK MANAGER
-    elif "open performance" in command or "open task manager" in command:
+    # OPEN CHROME
+    elif "open chrome" in command:
+        speak("Opening Chrome")
+        os.system("start chrome")
 
-        speak("Opening Task Manager")
-
-        os.system("start taskmgr")
-
-    # OPEN CALCULATOR
-    elif "open calculator" in command:
-
-        speak("Opening Calculator")
-
-        os.system("start calc")
-
-    # OPEN NOTEPAD
-    elif "open notepad" in command:
-
-        speak("Opening Notepad")
-
-        os.system("start notepad")
-
-    # OPEN PAINT
-    elif "open paint" in command:
-
-        speak("Opening Paint")
-
-        os.system("start mspaint")
-
-    # PLAY SONGS ON YOUTUBE
+    # PLAY SONG
     elif "play" in command:
-
         song = command.replace("play", "")
-
         speak(f"Playing {song}")
-
         pywhatkit.playonyt(song)
 
-    # SEARCH ANYTHING
+    # GOOGLE SEARCH
     elif "search" in command:
+        search_query = command.replace("search", "")
+        speak(f"Searching {search_query}")
 
-        query = command.replace("search", "")
+        webbrowser.open(
+            f"https://www.google.com/search?q={search_query}"
+        )
 
-        speak(f"Searching {query}")
+    # WHAT IS / WHO IS
+    elif "what is" in command or "who is" in command:
+        speak("Searching Google")
+        webbrowser.open(
+            f"https://www.google.com/search?q={command}"
+        )
 
-        pywhatkit.search(query)
-
-    # GENERAL GOOGLE SEARCH
     else:
+        speak("Command not recognized")
 
-        speak("Searching on Google")
-
-        pywhatkit.search(command)
